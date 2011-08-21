@@ -104,6 +104,18 @@ module Resque
         stats
       end
 
+      def stats_by_error(&block)
+        jobs, stats = select(&block), {}
+        jobs.each do |job|
+          error = job["error"]
+          # try to get meta
+          stats[error] ||= 0
+          stats[error] += 1
+        end
+        print_stats(stats) if print?
+        stats
+      end
+
       # Print stats
       def print_stats(stats)
         log too_many_message if @limiter.on?
@@ -211,6 +223,10 @@ module Resque
         def version?(version)
           meta = ObjectParser.get_meta(self['payload']['args'][0])
           version == meta["version"].to_s
+        end
+
+        def error?(error)
+          self["error"] == error.to_s
         end
 
         def site?(site)

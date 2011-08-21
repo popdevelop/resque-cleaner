@@ -21,6 +21,9 @@
         <span class="exception_filter">
           Exception: <%= exception_filter("filter_class","ex",@exceptions,@exception)%>
         </span>
+        <span class="error_filter">
+          Error: <%= error_filter("filter_class","err",@errors,@error)%>
+        </span>
         <span class="time_filter">
           From: <%= time_filter("filter_from","f",@from)%>
         </span>
@@ -43,6 +46,7 @@
           <input type="hidden" name="ex" value="<%=@exception%>" />
           <input type="hidden" name="ver" value="<%=@version%>" />
           <input type="hidden" name="site" value="<%=@site%>" />
+          <input type="hidden" name="err" value="<%=@error%>" />
           <select id="form_action" name="action">
             <option id="default_option" value="" selected="selected">-- Select Action --</option>
             <option value="clear">Clear</option>
