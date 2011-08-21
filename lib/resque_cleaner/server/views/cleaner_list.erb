@@ -12,6 +12,12 @@
         <span class="class_filter">
           Class: <%= class_filter("filter_class","c",@klasses,@klass)%>
         </span>
+        <span class="version_filter">
+          Version: <%= version_filter("filter_class","ver",@versions,@version)%>
+        </span>
+        <span class="site_filter">
+          Site: <%= site_filter("filter_class","site",@sites,@site)%>
+        </span>
         <span class="exception_filter">
           Exception: <%= exception_filter("filter_class","ex",@exceptions,@exception)%>
         </span>
@@ -35,6 +41,8 @@
           <input type="hidden" name="t" value="<%=@to%>" />
           <input type="hidden" name="p" value="<%=@paginate.page%>" />
           <input type="hidden" name="ex" value="<%=@exception%>" />
+          <input type="hidden" name="ver" value="<%=@version%>" />
+          <input type="hidden" name="site" value="<%=@site%>" />
           <select id="form_action" name="action">
             <option id="default_option" value="" selected="selected">-- Select Action --</option>
             <option value="clear">Clear</option>

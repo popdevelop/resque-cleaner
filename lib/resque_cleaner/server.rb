@@ -88,6 +88,26 @@ module ResqueCleaner
             html += "</select>"
           end
 
+          def version_filter(id, name, versions, value)
+            html = "<select id=\"#{id}\" name=\"#{name}\">"
+            html += "<option value=\"\">-</option>"
+            versions.each do |version|
+              selected = version.to_s == value ? 'selected="selected"' : ''
+              html += "<option #{selected} value=\"#{version}\">#{version}</option>"
+            end
+            html += "</select>"
+          end
+
+          def site_filter(id, name, sites, value)
+            html = "<select id=\"#{id}\" name=\"#{name}\">"
+            html += "<option value=\"\">-</option>"
+            sites.each do |site|
+              selected = site.to_s == value ? 'selected="selected"' : ''
+              html += "<option #{selected} value=\"#{site}\">#{site}</option>"
+            end
+            html += "</select>"
+          end
+
           def exception_filter(id, name, exceptions, value)
             html = "<select id=\"#{id}\" name=\"#{name}\">"
             html += "<option value=\"\">-</option>"
@@ -133,14 +153,15 @@ module ResqueCleaner
 
           @failed = cleaner.select(&block).reverse
 
-          url = "cleaner_list?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}"
-          @dump_url = "cleaner_dump?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}"
+          url = "cleaner_list?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}&ver=#{@version}&site=#{@site}"
+          @dump_url = "cleaner_dump?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}&ver=#{@version}&site=#{@site}"
           @paginate = Paginate.new(@failed, url, params[:p].to_i)
 
           @klasses = cleaner.stats_by_class.keys
           @exceptions = cleaner.stats_by_exception.keys
+          @versions = cleaner.stats_by_version.keys
+          @sites = cleaner.stats_by_site.keys
           @count = cleaner.select(&block).size
-
           erb File.read(ResqueCleaner::Server.erb_path('cleaner_list.erb'))
         end
 
@@ -162,7 +183,7 @@ module ResqueCleaner
             when "retry" then cleaner.requeue(false,{},&block)
             end
 
-          @url = "cleaner_list?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}"
+          @url = "cleaner_list?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}&ver=#{@version}&site=#{@site}"
           erb File.read(ResqueCleaner::Server.erb_path('cleaner_exec.erb'))
         end
 
@@ -209,6 +230,8 @@ module ResqueCleaner
       @to = params[:t]=="" ? nil : params[:t]
       @klass = params[:c]=="" ? nil : params[:c]
       @exception = params[:ex]=="" ? nil : params[:ex]
+      @version = params[:ver]=="" ? nil : params[:ver]
+      @site = params[:site]=="" ? nil : params[:site]
     end
 
     def filter_block
@@ -217,6 +240,8 @@ module ResqueCleaner
         (!@to || j.before?(hours_ago(@to))) &&
         (!@klass || j.klass?(@klass)) &&
         (!@exception || j.exception?(@exception)) &&
+        (!@version || j.version?(@version)) &&
+        (!@site || j.site?(@site)) &&
         (!@sha1 || @sha1[Digest::SHA1.hexdigest(j.to_json)])
       }
     end

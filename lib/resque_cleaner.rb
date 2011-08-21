@@ -70,7 +70,36 @@ module Resque
           stats[exception] ||= 0
           stats[exception] += 1
         end
+        print_stats(stats) if print?
+        stats
+      end
 
+      def stats_by_version(&block)
+        jobs, stats = select(&block), {}
+        jobs.each do |job|
+          # try to get meta
+          meta = ObjectParser.get_meta(job['payload']['args'][0])
+          version = meta["version"]
+          unless version.nil?
+            stats[version] ||= 0
+            stats[version] += 1
+          end
+        end
+        print_stats(stats) if print?
+        stats
+      end
+
+      def stats_by_site(&block)
+        jobs, stats = select(&block), {}
+        jobs.each do |job|
+          # try to get meta
+          meta = ObjectParser.get_meta(job['payload']['args'][0])
+          site = meta["site"]
+          unless site.nil?
+            stats[site] ||= 0
+            stats[site] += 1
+          end
+        end
         print_stats(stats) if print?
         stats
       end
@@ -177,6 +206,16 @@ module Resque
         # Returns true if the exception raised by the failed job matches. Otherwise returns false.
         def exception?(exception)
           self["exception"] == exception.to_s
+        end
+
+        def version?(version)
+          meta = ObjectParser.get_meta(self['payload']['args'][0])
+          version == meta["version"].to_s
+        end
+
+        def site?(site)
+          meta = ObjectParser.get_meta(self['payload']['args'][0])
+          site == meta["site"].to_s
         end
 
         # Returns true if the queue of the job matches. Otherwise returns false.
