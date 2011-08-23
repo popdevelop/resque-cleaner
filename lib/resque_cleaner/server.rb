@@ -167,12 +167,13 @@ module ResqueCleaner
           @dump_url = "cleaner_dump?c=#{@klass}&ex=#{@exception}&f=#{@from}&t=#{@to}&ver=#{@version}&site=#{@site}&err=#{@error}"
           @paginate = Paginate.new(@failed, url, params[:p].to_i)
 
-          @klasses = cleaner.stats_by_class.keys
-          @exceptions = cleaner.stats_by_exception.keys
-          @versions = cleaner.stats_by_version.keys
-          @sites = cleaner.stats_by_site.keys
-          @errors = cleaner.stats_by_error.keys
-          @count = cleaner.select(&block).size
+          @klasses = cleaner.stats_by_class(@failed).keys
+          @exceptions = cleaner.stats_by_exception(@failed).keys
+          @versions = cleaner.stats_by_version(@failed).keys
+          @sites = cleaner.stats_by_site(@failed).keys
+          @errors = cleaner.stats_by_error(@failed).keys
+          @count = @failed.size
+
           erb File.read(ResqueCleaner::Server.erb_path('cleaner_list.erb'))
         end
 

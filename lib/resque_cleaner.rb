@@ -37,8 +37,8 @@ module Resque
       end
 
       # Stats by date.
-      def stats_by_date(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_date(jobs)
+        stats = {}
         jobs.each do |job|
           date = job["failed_at"][0,10]
           stats[date] ||= 0
@@ -50,8 +50,8 @@ module Resque
       end
 
       # Stats by class.
-      def stats_by_class(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_class(jobs)
+        stats = {}
         jobs.each do |job|
           klass = job["payload"]["class"]
           stats[klass] ||= 0
@@ -63,8 +63,8 @@ module Resque
       end
 
       # Stats by exception.
-      def stats_by_exception(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_exception(jobs)
+        stats = {}
         jobs.each do |job|
           exception = job["exception"]
           stats[exception] ||= 0
@@ -74,8 +74,8 @@ module Resque
         stats
       end
 
-      def stats_by_version(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_version(jobs)
+        stats = {}
         jobs.each do |job|
           # try to get meta
           meta = ObjectParser.get_meta(job['payload']['args'][0])
@@ -91,8 +91,8 @@ module Resque
         stats
       end
 
-      def stats_by_site(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_site(jobs)
+        stats = {}
         jobs.each do |job|
           # try to get meta
           meta = ObjectParser.get_meta(job['payload']['args'][0])
@@ -108,8 +108,8 @@ module Resque
         stats
       end
 
-      def stats_by_error(&block)
-        jobs, stats = select(&block), {}
+      def stats_by_error(jobs)
+        stats = {}
         jobs.each do |job|
           error = job["error"]
           # try to get meta
@@ -247,7 +247,7 @@ module Resque
       # Through the Limiter class, you accesses only the last x(default 1000)
       # jobs.
       class Limiter
-        DEFAULT_MAX_JOBS = 1000
+        DEFAULT_MAX_JOBS = 100000
         attr_accessor :maximum
         def initialize(cleaner)
           @cleaner = cleaner
