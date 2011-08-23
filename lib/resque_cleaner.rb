@@ -79,10 +79,12 @@ module Resque
         jobs.each do |job|
           # try to get meta
           meta = ObjectParser.get_meta(job['payload']['args'][0])
-          version = meta["version"]
-          unless version.nil?
-            stats[version] ||= 0
-            stats[version] += 1
+          unless meta.nil?
+            version = meta["version"]
+            unless version.nil?
+              stats[version] ||= 0
+              stats[version] += 1
+            end
           end
         end
         print_stats(stats) if print?
@@ -94,10 +96,12 @@ module Resque
         jobs.each do |job|
           # try to get meta
           meta = ObjectParser.get_meta(job['payload']['args'][0])
-          site = meta["site"]
-          unless site.nil?
-            stats[site] ||= 0
-            stats[site] += 1
+          unless meta.nil?
+            site = meta["site"]
+            unless site.nil?
+              stats[site] ||= 0
+              stats[site] += 1
+            end
           end
         end
         print_stats(stats) if print?
